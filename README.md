@@ -16,7 +16,7 @@ A utility for reading configurations from YAML files to run Langchain workflows.
 ## Installation
 
 ```bash
-pip install roleplay
+pip install langchain-roleplay
 ```
 
 ## Quick Start
