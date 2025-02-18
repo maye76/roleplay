@@ -6,7 +6,7 @@ on:
   push:
     tags:
       - 'v*'       # 匹配v开头的tag
-  # workflow_dispatch:
+  workflow_dispatch:
 
 permissions:
   id-token: write  # 关键权限！启用OIDC
