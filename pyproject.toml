@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "roleplay"
-version = "0.1.0"
+version = "0.0.1"
 description = "A utility for reading configurations from a YAML file to run Langchain."
 authors = [{ name = "maye76", email = "hi@maye.run" }]
 readme = "README.md"
