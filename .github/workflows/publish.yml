@@ -1,9 +1,12 @@
 name: Publish Python Package
 
 on:
-  release:
-    types: [created]
-  workflow_dispatch:
+  # release:
+  #   types: [created]
+  push:
+    tags:
+      - 'v*'       # 匹配v开头的tag
+  # workflow_dispatch:
 
 permissions:
   id-token: write  # 关键权限！启用OIDC
