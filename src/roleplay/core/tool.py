@@ -6,8 +6,10 @@ from pydantic import BaseModel, Field, PrivateAttr
 
 import os
 import weakref
+import logging
 from typing import Any, Dict, List, Optional, Type
 
+_logger = logging.getLogger(__name__)
 
 class Tool(BaseModel):
     """A tool model representing executable functionality"""
@@ -61,7 +63,10 @@ def register_tool(name: str, tool: Tool):
     """
     Register a tool with the given name.
     """
+    if name in _all_tools:
+        _logger.warning(f"Tool {name} already exists.")
     _all_tools[name] = tool
+    _logger.debug(f"Registered tool: {name}")
 
 def check_tool(name: str) -> bool:
     """
@@ -100,6 +105,8 @@ def generate_class(class_name: str,
         param_description = param.get('description', '')
         annotations[param_name] = param_type
         defaults[param_name] = Field(description=param_description)
+
+    _logger.debug(f"Generated class: {class_name}: {annotations}")
 
     # Dynamically create the Pydantic model class
     return type(class_name, (BaseModel,), {

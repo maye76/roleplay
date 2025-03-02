@@ -2,8 +2,11 @@
 from langchain_core.messages import HumanMessage, BaseMessage
 from pydantic import BaseModel, Field
 
+import logging
 from datetime import datetime
 from typing import Any, Dict, List
+
+_logger = logging.getLogger(__name__)
 
 class BaseMemory(BaseModel):
     memories: Dict[str, Any] = Field(default={'meta': [], 'history': []})
@@ -34,9 +37,11 @@ class BaseMemory(BaseModel):
 
         return_dict = {'history': history}
         return_dict.update(self._load(_input, history))
+        _logger.debug(f"Memory loaded: {return_dict}")
         return return_dict
 
     def save(self, _input: HumanMessage, outputs: Dict[str, Any]) -> int:
+        _logger.debug(f"Memory saved: {outputs}")
         self.memories['meta'].append({'input': _input, 'output': outputs, 'time': datetime.now()})
         self.memories['history'].append({'input': _input,
                                             'output': outputs['output'],
@@ -47,3 +52,4 @@ class BaseMemory(BaseModel):
         self.memories['meta'] = []
         self.memories['history'] = []
         self._clear()
+        _logger.debug(f"Memory cleared")

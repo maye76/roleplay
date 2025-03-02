@@ -49,6 +49,7 @@ class Role(BaseModel):
             raise ValueError(f"LLM {self.llm} not found.")
         if self.llm_chain is not None:
             return
+        self.config['stream_usage'] = True
         llm = get_llm(self.llm, **self.config)
         if len(tools := self._get_tools()) > 0:
             llm = llm.bind_tools(tools)
@@ -75,7 +76,7 @@ class Role(BaseModel):
             back = get_tool(call.tool).run(**call.tool_input)
             if not isinstance(back, str):
                 raise ValueError("Bot tool back must return a string.")
-            _logger.info(f'Tool Back: {back}')
+            _logger.debug(f'Tool Back: {back}')
             tool_msg = ToolMessage(content=back, tool_call_id=call_id)
             self.parser.add_intermediate_step(call, ai_msg, tool_msg)
 
@@ -86,7 +87,6 @@ class Role(BaseModel):
 
             if len(mp) > 0:
                 action, _call_id = mp[0]
-                _logger.info(action.log)
                 call = action
                 call_id = _call_id
                 tool_history = tool_history + [ai_msg, tool_msg]
@@ -100,7 +100,6 @@ class Role(BaseModel):
         mp = self.parser.parse(ai_msg)
         if not isinstance(mp, AgentFinish):
             action, _call_id = mp[0]
-            _logger.info(action.log)
             mp = self._tool_loop(ai_msg, action, _call_id, [kwargs['input']])
         if not isinstance(mp, AgentFinish):
             raise ValueError("Tool loop error.")
@@ -116,7 +115,10 @@ def register_role(name: str, role: Role):
     """
     Register a role with the given name.
     """
+    if name in _all_roles:
+        _logger.warning(f"Role {name} already exists.")
     _all_roles[name] = role
+    _logger.debug(f"Registered role: {name}")
 
 def check_role(name: str) -> bool:
     """
